@@ -36,14 +36,14 @@ def FFT():
 	fs = 100
 	nSample = len(value)
 	nStart = 0
-#	amplitude_delta = 0.0
-#	amplitude_sin = 0.0
-#	amplitude_lowalpha = 0.0
-#	amplitude_highalpha = 0.0
-#	amplitude_lowbeta = 0.0
-#	amplitude_highbeta = 0.0
-#	amplitude_lowganma = 0.0
-#	amplitude_midganma = 0.0
+	amplitude_delta = 0.0
+	amplitude_sin = 0.0
+	amplitude_lowalpha = 0.0
+	amplitude_highalpha = 0.0
+	amplitude_lowbeta = 0.0
+	amplitude_highbeta = 0.0
+	amplitude_lowganma = 0.0
+	amplitude_midganma = 0.0
 
 	#時間情報
 	t1 = nStart / fs
@@ -84,9 +84,40 @@ def FFT():
 				peakValue = spectrumAmplitude[k]
 			#脳波種別に割り当て
 			if float(spectrumAmplitude[k]) >= 0.5 and float(spectrumAmplitude[k]) <= 2.75:
-				print ("f")
-	print("peak frequency: " + str(peakFreq) + "[Hz]")
-	print("heart rate: " + str(60 * peakFreq) + "[bpm]")
+				amplitude_delta += spectrumAmplitude[k]
+				print ("delta")
+			elif float(spectrumAmplitude[k]) >= 3.5 and float(spectrumAmplitude[k]) <= 6.75:
+				amplitude_sin += spectrumAmplitude[k]
+				print ("sin")
+			elif float(spectrumAmplitude[k]) >= 7.5 and float(spectrumAmplitude[k]) <= 9.25:
+				amplitude_lowalpha += spectrumAmplitude[k]
+				print ("low alpha")
+			elif float(spectrumAmplitude[k]) >= 10 and float(spectrumAmplitude[k]) <= 11.75:
+				amplitude_highalpha += spectrumAmplitude[k]
+				print ("high alpha")
+			elif float(spectrumAmplitude[k]) >= 13 and float(spectrumAmplitude[k]) <= 16.75:
+				amplitude_lowbeta += spectrumAmplitude[k]
+				print ("low beta")
+			elif float(spectrumAmplitude[k]) >= 18 and float(spectrumAmplitude[k]) <= 29.75:
+				apmlitude_highbeta += spectrumAmplitude[k]
+				print ("high beta")
+			elif float(spectrumAmplitude[k]) >= 31 and float(spectrumAmplitude[k]) <= 39.75:
+				amplitude_lowganma += spectrumAmplitude[k]
+				print ("low ganma")
+			elif float(spectrumAmplitude[k]) >= 41 and float(spectrumAmplitude[k]) <= 49.75:
+				amplitude_midganma += spectrumApmlitude[k]
+				print ("mid ganma")
+
+	print ("peak frequency: " + str(peakFreq) + "[Hz]")
+	print ("heart rate: " + str(60 * peakFreq) + "[bpm]")
+	print ("delta" + str(amplitude_delta))
+	print ("sin" + str(amplitude_sin))
+	print ("low alpha" + str(amplitude_lowalpha))
+	print ("high alpha" + str(amplitude_highalpha))
+	print ("low beta" + str(amplitude_lowbeta))
+	print ("high beta" + str(amplitude_highbeta))
+	print ("low ganma" + str(amplitude_lowganma))
+	print ("mid ganma" + str(amplitude_midganma))
 
 signal.signal(signal.SIGALRM, callback)
 signal.setitimer(signal.ITIMER_REAL, 0.1, 0.01)
