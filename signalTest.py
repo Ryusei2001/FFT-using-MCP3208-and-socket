@@ -20,6 +20,7 @@ def timer():
 		signal.setitimer(signal.ITIMER_REAL, 0.1, 0.007)
 		time.sleep(1)
 
+
 		timer2()
 		timer3()
 		time.sleep(5)
