@@ -7,6 +7,7 @@ import numpy as np
 import time
 from time import sleep
 import signal
+import random
 
 class BlockingServerBase:
 	def __init__(self, timeout=60, buffer=1024):
@@ -44,12 +45,15 @@ class BlockingServerBase:
 		while True:
 			try:
 				str = ""
-				message_recv = conn.recv(self.__buffer).decode('utf-8')
-				message_resp = self.respond(message_recv)
+#				message_recv = conn.recv(self.__buffer).decode('utf-8')
+#				message_resp = self.respond(message_recv)
 				#conn.send(message_resp.encode('utf-8'))
 				self.measurement()
-				for i in range(nSample):
-						str = str + ('{:1.5f}'.format(BufferA[i]) + ",")
+				for i in range(nSample - 1):
+						#str = str + ('{:1.5f}'.format(BufferA[i]) + ",")
+						str = str + ('{:1.4f}'.format(random.random()) + ",")
+
+				str = str + '{:1.4f}'.format(random.random())
 				conn.send(str.encode('utf-8'))
 			except ConnectionResetError:
 				break
@@ -72,7 +76,7 @@ class BlockingServerBase:
 		CallbackCount = 0
 		signal.signal(signal.SIGALRM, self.measurement_callback)
 		signal.setitimer(signal.ITIMER_REAL, 0.1, 0.007)
-		time.sleep(1)
+		time.sleep(5)
 
 	def respond(self, message:str) -> str:
 		return ""
