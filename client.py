@@ -36,23 +36,29 @@ class BaseClient:
         def received(self, message:str):
                 value = []
                 value = message.split(',')
-                print("Row:################")
+                print("Row:")
                 print(message)
-                print("List////////////////")
+                print("List:")
                 print(value)
                 FFTrow = len(value)
                 self.FFT(value, FFTrow)
 
         def FFT(self, value:list, FFTrow:int):
+                if list(bin(FFTrow)).count('1') != 1:
+                    pass
                 SpectrumAmplitude = [0.0] * FFTrow
                 FFT = np.fft.fft(value[0:0+FFTrow])
                 for i in range(FFTrow):
                         SpectrumAmplitude[i] = np.sqrt(FFT[i].real * FFT[i].real + FFT[i].imag * FFT[i].imag)
 
-                print("FFT%%%%%%%%%%%%%%%%%")
+                print("FFT Result")
+				#toriaezu
+                value_freq = 128
+
+                Freqency = [0.0] * FFTrow
                 for j in range(FFTrow):
                         print(SpectrumAmplitude[j])
-                        print()
+                        Freqency[j] = (j * value_freq) / FFTrow
 
 class InetClient(BaseClient):
         #def __init__(self, host:str="192.168.1.7", port:int=8080) -> None:
