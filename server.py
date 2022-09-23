@@ -47,13 +47,12 @@ class BlockingServerBase:
 				str = ""
 #				message_recv = conn.recv(self.__buffer).decode('utf-8')
 #				message_resp = self.respond(message_recv)
-				#conn.send(message_resp.encode('utf-8'))
+#				conn.send(message_resp.encode('utf-8'))
 				self.measurement()
 				for i in range(nSample - 1):
-						#str = str + ('{:1.5f}'.format(BufferA[i]) + ",")
-						str = str + ('{:1.4f}'.format(random.random()) + ",")
+					str = str + ('{:1.5f}'.format(BufferA[i]) + ",")
 
-				str = str + '{:1.4f}'.format(random.random())
+				str = str + ('{:1.5f}'.format(BufferA[i]))
 				conn.send(str.encode('utf-8'))
 			except ConnectionResetError:
 				break
@@ -65,7 +64,9 @@ class BlockingServerBase:
 		global CallbackCount
 		global BufferA
 		global adc
-		BufferA = np.append(BufferA, adc.value)
+		Vref = 3.3
+		volt = np.round(adc.value * Vref, 5)
+		BufferA = np.append(BufferA, volt)
 		if CallbackCount >= 128:
 			signal.alarm(0)
 		else:

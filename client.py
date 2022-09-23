@@ -23,7 +23,7 @@ class BaseClient:
 #			else:
 #				message_send=message
 #				flag = True
-			self.__socket.send(message_send.encode('utf-8'))
+#			self.__socket.send(message_send.encode('utf-8'))
 			message_recv = self.__socket.recv(self.__buffer).decode('utf-8')
 			self.received(message_recv)
 			if flag:
