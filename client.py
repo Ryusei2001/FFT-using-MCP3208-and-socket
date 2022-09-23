@@ -45,26 +45,26 @@ class BaseClient:
 		self.FFT(value, FFTrow)
 
 	def FFT(self, value: list, FFTrow: int):
+		#sampling frequency
+		value_freq = 128
+
 		if list(bin(FFTrow)).count('1') != 1:
-			pass
+			print ("The number must be a power of 2. This is {}".format(FFTrow))
+			return
 		SpectrumAmplitude = [0.0] * FFTrow
+		Freqency = [0.0] * FFTrow
 		FFT = np.fft.fft(value[0:0+FFTrow])
 		for i in range(FFTrow):
 			SpectrumAmplitude[i] = np.sqrt(
 				FFT[i].real * FFT[i].real + FFT[i].imag * FFT[i].imag)
+			Freqency[i] = (i * value_freq) / FFTrow
 
-		print("FFT Result")
-		# toriaezu
-		value_freq = 128
-
-		Freqency = [0.0] * FFTrow
-		for j in range(FFTrow):
-			print(SpectrumAmplitude[j])
-			Freqency[j] = (j * value_freq) / FFTrow
-
+		print("FFT Result:")
+		for j in range(int(FFTrow/2)):
+			print("{}\t{}".format(Freqency[j], SpectrumAmplitude[j]))
 
 class InetClient(BaseClient):
-	# def __init__(self, host:str="192.168.1.7", port:int=8080) -> None:
+	#def __init__(self, host:str="192.168.1.7", port:int=8080) -> None:
 	def __init__(self, host: str = "192.168.0.6", port: int = 8080) -> None:
 		self.server = (host, port)
 		super().__init__(timeout=60, buffer=1024)

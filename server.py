@@ -35,6 +35,7 @@ class BlockingServerBase:
 			pass
 
 	def accept(self, address, family:int, typ:int, proto:int) -> None:
+		global nSample
 		self.__socket = socket.socket(family, typ, proto)
 		self.__socket.settimeout(self.__timeout)
 		self.__socket.bind(address)
@@ -49,7 +50,14 @@ class BlockingServerBase:
 #				message_resp = self.respond(message_recv)
 #				conn.send(message_resp.encode('utf-8'))
 				self.measurement()
-				for i in range(nSample - 1):
+
+#debug
+				global BufferA
+				print(BufferA)
+				print(len(BufferA))
+
+
+				for i in range(len(BufferA) - 1):
 					str = str + ('{:1.5f}'.format(BufferA[i]) + ",")
 
 				str = str + ('{:1.5f}'.format(BufferA[i]))
@@ -67,17 +75,19 @@ class BlockingServerBase:
 		Vref = 3.3
 		volt = np.round(adc.value * Vref, 5)
 		BufferA = np.append(BufferA, volt)
-		if CallbackCount >= 128:
+		if CallbackCount >= 127:
 			signal.alarm(0)
 		else:
 			CallbackCount = CallbackCount + 1
 
 	def measurement(self):
 		global CallbackCount
+		global BufferA
 		CallbackCount = 0
+		BufferA = np.zeros(0)
 		signal.signal(signal.SIGALRM, self.measurement_callback)
 		signal.setitimer(signal.ITIMER_REAL, 0.1, 0.007)
-		time.sleep(5)
+		time.sleep(2)
 
 	def respond(self, message:str) -> str:
 		return ""
@@ -95,7 +105,3 @@ class InetServer(BlockingServerBase):
 
 if __name__ == "__main__":
 	InetServer()
-
-#for i in range(8):
-#	data.append(adc.value * Vref)
-#print(data)

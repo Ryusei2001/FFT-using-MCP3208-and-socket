@@ -6,5 +6,5 @@ adc = MCP3208(channel=1, differential=False)
 
 while True:
 	str = np.round(adc.value * Vref, 5)
-	print(str)
 	sleep(0.1)
+	print("Message: {}".format(str))
