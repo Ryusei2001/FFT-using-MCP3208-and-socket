@@ -46,7 +46,7 @@ class BaseClient:
 
 	def FFT(self, value: list, FFTrow: int):
 		#sampling frequency
-		value_freq = 128
+		value_freq = 50
 
 		if list(bin(FFTrow)).count('1') != 1:
 			print ("The number must be a power of 2. This is {}".format(FFTrow))

@@ -1,13 +1,13 @@
-from gpiozero import MCP3208
 import os
 import socket
 import struct
 import math
 import numpy as np
 import time
-from time import sleep
 import signal
 import random
+from gpiozero import MCP3208
+from time import sleep
 
 class BlockingServerBase:
 	def __init__(self, timeout=60, buffer=1024):
@@ -17,7 +17,6 @@ class BlockingServerBase:
 		adc = MCP3208(channel=0, differential=False)
 		nSample = 128
 		self.close()
-		Vref = 3.3
 		BufferA = np.array([])
 		self.__socket = None
 		self.__timeout = timeout
@@ -76,6 +75,7 @@ class BlockingServerBase:
 		volt = np.round(adc.value * Vref, 5)
 		BufferA = np.append(BufferA, volt)
 		if CallbackCount >= 127:
+			print("signal finish! {}".format(len(BufferA)))
 			signal.alarm(0)
 		else:
 			CallbackCount = CallbackCount + 1
@@ -86,8 +86,10 @@ class BlockingServerBase:
 		CallbackCount = 0
 		BufferA = np.zeros(0)
 		signal.signal(signal.SIGALRM, self.measurement_callback)
-		signal.setitimer(signal.ITIMER_REAL, 0.1, 0.007)
-		time.sleep(2)
+
+#		signal.setitimer(signal.ITIMER_REAL, 1, 0.007)
+		signal.setitimer(signal.ITIMER_REAL, 0.1, 0.02)
+		time.sleep(3)
 
 	def respond(self, message:str) -> str:
 		return ""
