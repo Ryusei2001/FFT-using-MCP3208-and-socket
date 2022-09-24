@@ -49,13 +49,6 @@ class BlockingServerBase:
 #				message_resp = self.respond(message_recv)
 #				conn.send(message_resp.encode('utf-8'))
 				self.measurement()
-
-#debug
-				global BufferA
-				print(BufferA)
-				print(len(BufferA))
-
-
 				for i in range(len(BufferA) - 1):
 					str = str + ('{:1.5f}'.format(BufferA[i]) + ",")
 
@@ -74,6 +67,8 @@ class BlockingServerBase:
 		Vref = 3.3
 		volt = np.round(adc.value * Vref, 5)
 		BufferA = np.append(BufferA, volt)
+#debug
+		print("{}\t{}".format(CallbackCount, BufferA[CallbackCount]))
 		if CallbackCount >= 127:
 			print("signal finish! {}".format(len(BufferA)))
 			signal.alarm(0)
@@ -89,7 +84,10 @@ class BlockingServerBase:
 
 #		signal.setitimer(signal.ITIMER_REAL, 1, 0.007)
 		signal.setitimer(signal.ITIMER_REAL, 0.1, 0.02)
-		time.sleep(3)
+
+		#time.sleep(3.5)
+		while CallbackCount < 127:
+			time.sleep(0.5)
 
 	def respond(self, message:str) -> str:
 		return ""
