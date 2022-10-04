@@ -67,8 +67,6 @@ class BlockingServerBase:
 		Vref = 3.3
 		volt = np.round(adc.value * Vref, 5)
 		BufferA = np.append(BufferA, volt)
-#debug
-		print("{}\t{}".format(CallbackCount, BufferA[CallbackCount]))
 		if CallbackCount >= 127:
 			print("signal finish! {}".format(len(BufferA)))
 			signal.alarm(0)
@@ -82,7 +80,7 @@ class BlockingServerBase:
 		BufferA = np.zeros(0)
 		signal.signal(signal.SIGALRM, self.measurement_callback)
 
-#		signal.setitimer(signal.ITIMER_REAL, 1, 0.007)
+#		signal.setitimer(signal.ITIMER_REAL, 3, 0.009)
 		signal.setitimer(signal.ITIMER_REAL, 0.1, 0.02)
 
 		#time.sleep(3.5)
