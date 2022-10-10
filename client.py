@@ -1,9 +1,9 @@
 import socket
 import numpy as np
-
+from matplotlib import pyplot as plt
 
 class BaseClient:
-	def __init__(self, timeout: int = 10, buffer: int = 1024):
+	def __init__(self, timeout: int = 10, buffer: int = 4096):
 		global SignalFrequency
 		self.__socket = None
 		self.__address = None
@@ -39,6 +39,7 @@ class BaseClient:
 		print("List:")
 		print(value)
 		FFTrow = len(value)
+		print("{}行のデータを受信".format(FFTrow))
 		self.FFT(value, FFTrow, SignalFrequency)
 
 	def FFT(self, value: list, FFTrow: int, freq: int):
@@ -55,7 +56,7 @@ class BaseClient:
 				Freqency[i] = (i * freq) / FFTrow
 
 			plt.subplot(2,1,1)
-			plt.plot(BufferA, color="b", linewidth=1.0, linestyle="-")
+			plt.plot(value, color="b", linewidth=1.0, linestyle="-")
 			plt.title("Volts", fontsize=14, fontname='serif')
 			plt.xlabel("Time", fontsize=14, fontname='serif')
 			plt.ylabel("Amplitude [V]", fontsize=14, fontname='serif')
@@ -70,14 +71,14 @@ class BaseClient:
 
 			plt.tight_layout()
 			plt.draw()
-			pplt.pause(0.0001)
+			plt.pause(0.0001)
 			plt.clf()
 
 class InetClient(BaseClient):
 	def __init__(self, host:str="192.168.11.60", port:int=8080) -> None:
 	#def __init__(self, host: str = "192.168.0.6", port: int = 8080) -> None:
 		self.server = (host, port)
-		super().__init__(timeout=60, buffer=1024)
+		super().__init__(timeout=60, buffer=4096)
 		super().connect(self.server, socket.AF_INET, socket.SOCK_STREAM, 0)
 
 
