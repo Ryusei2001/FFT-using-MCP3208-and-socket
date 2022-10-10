@@ -15,13 +15,13 @@ class BlockingServerBase:
 		global nSample
 		global BufferA
 		adc = MCP3208(channel=0, differential=False)
-		nSample = 128
-		self.close()
 		BufferA = np.array([])
 		self.__socket = None
 		self.__timeout = timeout
 		self.__buffer = buffer
 		self.close()
+		nSample = 64
+		SignalFrequency = 50
 
 	def __del__(self):
 		self.close()
@@ -45,9 +45,6 @@ class BlockingServerBase:
 		while True:
 			try:
 				str = ""
-#				message_recv = conn.recv(self.__buffer).decode('utf-8')
-#				message_resp = self.respond(message_recv)
-#				conn.send(message_resp.encode('utf-8'))
 				self.measurement()
 				for i in range(len(BufferA) - 1):
 					str = str + ('{:1.5f}'.format(BufferA[i]) + ",")
@@ -67,8 +64,8 @@ class BlockingServerBase:
 		Vref = 3.3
 		volt = np.round(adc.value * Vref, 5)
 		BufferA = np.append(BufferA, volt)
-		if CallbackCount >= 127:
-			print("signal finish! {}".format(len(BufferA)))
+		if CallbackCount >= nSample - 1:
+			print("Finished measurement with {} rows!".format(len(BufferA)))
 			signal.alarm(0)
 		else:
 			CallbackCount = CallbackCount + 1
@@ -76,15 +73,12 @@ class BlockingServerBase:
 	def measurement(self):
 		global CallbackCount
 		global BufferA
+		global SignalFrequency
 		CallbackCount = 0
 		BufferA = np.zeros(0)
 		signal.signal(signal.SIGALRM, self.measurement_callback)
-
-#		signal.setitimer(signal.ITIMER_REAL, 3, 0.009)
-		signal.setitimer(signal.ITIMER_REAL, 0.1, 0.02)
-
-		#time.sleep(3.5)
-		while CallbackCount < 127:
+		signal.setitimer(signal.ITIMER_REAL, 0.1, 1 / SignalFrequency)
+		while CallbackCount < nSample - 1:
 			time.sleep(0.5)
 
 	def respond(self, message:str) -> str:

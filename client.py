@@ -4,10 +4,12 @@ import numpy as np
 
 class BaseClient:
 	def __init__(self, timeout: int = 10, buffer: int = 1024):
+		global SignalFrequency
 		self.__socket = None
 		self.__address = None
 		self.__timeout = timeout
 		self.__buffer = buffer
+		SignalFrequency = 50
 
 	def connect(self, address, family: int, typ: int, proto: int):
 		self.__address = address
@@ -18,12 +20,6 @@ class BaseClient:
 	def send(self, message: str = "") -> None:
 		flag = False
 		while True:
-#			if message == "":
-#				message_send = input("> ")
-#			else:
-#				message_send=message
-#				flag = True
-#			self.__socket.send(message_send.encode('utf-8'))
 			message_recv = self.__socket.recv(self.__buffer).decode('utf-8')
 			self.received(message_recv)
 			if flag:
@@ -35,6 +31,7 @@ class BaseClient:
 			pass
 
 	def received(self, message: str):
+		global SignalFrequency
 		value = []
 		value = message.split(',')
 		print("Row:")
@@ -42,30 +39,43 @@ class BaseClient:
 		print("List:")
 		print(value)
 		FFTrow = len(value)
-		self.FFT(value, FFTrow)
+		self.FFT(value, FFTrow, SignalFrequency)
 
-	def FFT(self, value: list, FFTrow: int):
-		#sampling frequency
-		value_freq = 50
-
+	def FFT(self, value: list, FFTrow: int, freq: int):
 		if list(bin(FFTrow)).count('1') != 1:
 			print ("The number must be a power of 2. This is {}".format(FFTrow))
-			return
-		SpectrumAmplitude = [0.0] * FFTrow
-		Freqency = [0.0] * FFTrow
-		FFT = np.fft.fft(value[0:0+FFTrow])
-		for i in range(FFTrow):
-			SpectrumAmplitude[i] = np.sqrt(
-				FFT[i].real * FFT[i].real + FFT[i].imag * FFT[i].imag)
-			Freqency[i] = (i * value_freq) / FFTrow
+			return False
+		else:
+			SpectrumAmplitude = [0.0] * FFTrow
+			Freqency = [0.0] * FFTrow
+			FFT = np.fft.fft(value[0:FFTrow])
+			for i in range(FFTrow):
+				SpectrumAmplitude[i] = np.sqrt(
+					FFT[i].real * FFT[i].real + FFT[i].imag * FFT[i].imag)
+				Freqency[i] = (i * freq) / FFTrow
 
-		print("FFT Result:")
-		for j in range(int(FFTrow/2)):
-			print("{}\t{}".format(Freqency[j], SpectrumAmplitude[j]))
+			plt.subplot(2,1,1)
+			plt.plot(BufferA, color="b", linewidth=1.0, linestyle="-")
+			plt.title("Volts", fontsize=14, fontname='serif')
+			plt.xlabel("Time", fontsize=14, fontname='serif')
+			plt.ylabel("Amplitude [V]", fontsize=14, fontname='serif')
+
+			plt.subplot(2,1,2)
+			plt.plot(Freqency, SpectrumAmplitude, color="b", linewidth=1.0, linestyle="-")
+			plt.xlim(0, freq / 2)
+			plt.ylim(0, 30)
+			plt.title("Freqency spectrum", fontsize=14, fontname='serif')
+			plt.xlabel("Freqency [Hz]", fontsize=14, fontname='serif')
+			plt.ylabel("Amplitude", fontsize=14, fontname='serif')
+
+			plt.tight_layout()
+			plt.draw()
+			pplt.pause(0.0001)
+			plt.clf()
 
 class InetClient(BaseClient):
-	#def __init__(self, host:str="192.168.1.7", port:int=8080) -> None:
-	def __init__(self, host: str = "192.168.0.6", port: int = 8080) -> None:
+	def __init__(self, host:str="192.168.11.60", port:int=8080) -> None:
+	#def __init__(self, host: str = "192.168.0.6", port: int = 8080) -> None:
 		self.server = (host, port)
 		super().__init__(timeout=60, buffer=1024)
 		super().connect(self.server, socket.AF_INET, socket.SOCK_STREAM, 0)

@@ -1,4 +1,4 @@
-#from gpiozero import MCP3208
+from gpiozero import MCP3208
 from time import sleep
 from matplotlib import pyplot as plt
 import numpy as np
@@ -8,13 +8,13 @@ import random
 
 class readAnalog:
 	def __init__(self):
-		#global adc
+		global adc
 		global nSample
 		global SignalFrequency
 		global BufferA
-		#adc = MCP3208(channel=0, differential=False)
-		nSample = 4096	
-		SignalFrequency = 800
+		adc = MCP3208(channel=0, differential=False)
+		nSample = 64
+		SignalFrequency = 50
 		BufferA = np.array([])
 
 	def main(self):
@@ -30,8 +30,8 @@ class readAnalog:
 		global BufferA
 		global adc
 		Vref = 3.3
-		#volt = np.round(adc.value * Vref, 5)
-		volt = random.random()
+		volt = np.round(adc.value * Vref, 5)
+		#volt = random.random()
 		BufferA = np.append(BufferA, volt)
 		if CallbackCount >= nSample - 1:
 			print("Finished measurement with {} rows!".format(len(BufferA)))
