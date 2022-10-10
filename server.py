@@ -10,18 +10,19 @@ from gpiozero import MCP3208
 from time import sleep
 
 class BlockingServerBase:
-	def __init__(self, timeout=60, buffer=1024):
+	def __init__(self, timeout=60, buffer=4096):
 		global adc
 		global nSample
 		global BufferA
+		global SignalFrequency
 		adc = MCP3208(channel=0, differential=False)
 		BufferA = np.array([])
 		self.__socket = None
 		self.__timeout = timeout
 		self.__buffer = buffer
 		self.close()
-		nSample = 64
-		SignalFrequency = 50
+		nSample = 512
+		SignalFrequency = 80
 
 	def __del__(self):
 		self.close()
@@ -34,7 +35,6 @@ class BlockingServerBase:
 			pass
 
 	def accept(self, address, family:int, typ:int, proto:int) -> None:
-		global nSample
 		self.__socket = socket.socket(family, typ, proto)
 		self.__socket.settimeout(self.__timeout)
 		self.__socket.bind(address)
@@ -61,6 +61,8 @@ class BlockingServerBase:
 		global CallbackCount
 		global BufferA
 		global adc
+		global nSample
+
 		Vref = 3.3
 		volt = np.round(adc.value * Vref, 5)
 		BufferA = np.append(BufferA, volt)
@@ -74,6 +76,7 @@ class BlockingServerBase:
 		global CallbackCount
 		global BufferA
 		global SignalFrequency
+		global nSample
 		CallbackCount = 0
 		BufferA = np.zeros(0)
 		signal.signal(signal.SIGALRM, self.measurement_callback)
@@ -87,7 +90,7 @@ class BlockingServerBase:
 class InetServer(BlockingServerBase):
 	def __init__(self, host:str="0.0.0.0", port:int=8080) -> None:
 		self.server=(host,port)
-		super().__init__(timeout=60, buffer=1024)
+		super().__init__(timeout=60, buffer=4096)
 		self.accept(self.server, socket.AF_INET, socket.SOCK_STREAM, 0)
 
 	def respond(self, message:str) -> str:
