@@ -9,6 +9,7 @@ import random
 from gpiozero import MCP3208
 from time import sleep
 
+
 class BlockingServerBase:
 	def __init__(self, timeout=60, buffer=4096):
 		global adc
