@@ -9,7 +9,7 @@ class BaseClient:
 		self.__address = None
 		self.__timeout = timeout
 		self.__buffer = buffer
-		SignalFrequency = 50
+		SignalFrequency = 20
 
 	def connect(self, address, family: int, typ: int, proto: int):
 		self.__address = address
@@ -32,8 +32,9 @@ class BaseClient:
 
 	def received(self, message: str):
 		global SignalFrequency
-		value = []
-		value = message.split(',')
+		value_raw = []
+		value_raw = message.split(',')
+		value = [float(n) for n in value_raw]
 		print("Row:")
 		print(message)
 		print("List:")
@@ -56,10 +57,11 @@ class BaseClient:
 				Freqency[i] = (i * freq) / FFTrow
 
 			plt.subplot(2,1,1)
-			plt.plot(value, color="b", linewidth=1.0, linestyle="-")
-			plt.title("Volts", fontsize=14, fontname='serif')
+			plt.axis([0.0,len(value),-0.5,4])
+			plt.title("test", fontsize=14, fontname='serif')
 			plt.xlabel("Time", fontsize=14, fontname='serif')
-			plt.ylabel("Amplitude [V]", fontsize=14, fontname='serif')
+			plt.ylabel("Volt [V]", fontsize=14, fontname='serif')
+			plt.plot(value, color="b", linewidth=1.0, linestyle="-")
 
 			plt.subplot(2,1,2)
 			plt.plot(Freqency, SpectrumAmplitude, color="b", linewidth=1.0, linestyle="-")
@@ -75,7 +77,7 @@ class BaseClient:
 			plt.clf()
 
 class InetClient(BaseClient):
-	def __init__(self, host:str="192.168.11.60", port:int=8080) -> None:
+	def __init__(self, host:str="192.168.11.90", port:int=8080) -> None:
 	#def __init__(self, host: str = "192.168.0.6", port: int = 8080) -> None:
 		self.server = (host, port)
 		super().__init__(timeout=60, buffer=4096)
